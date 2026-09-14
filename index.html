@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cutting Online — MVP</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header><div><h1>Cutting Online</h1><span>Раскрой листовых материалов</span></div><button id="settingsBtn" class="secondary" aria-label="Открыть настройки" title="Настройки">⚙</button></header>
+<main>
+<section class="panel"><h2>1. Листы материала</h2><div class="toolbar"><button id="addSheet">＋ Лист</button><button id="addStock" class="secondary">＋ Остаток</button></div><table id="sheets"><thead><tr><th>Материал</th><th>Длина</th><th>Ширина</th><th>Кол-во</th><th></th></tr></thead><tbody></tbody></table></section>
+<section class="panel"><h2>2. Детали</h2><div class="toolbar"><button id="addPart">＋ Деталь</button><label class="file secondary">Импорт CSV<input type="file" id="csv" accept=".csv,text/csv"></label><button id="exportBtn" class="secondary">Экспорт CSV</button></div><table id="parts"><thead><tr><th>№</th><th>Наименование</th><th>Материал</th><th>Длина</th><th>Ширина</th><th>Кол-во</th><th>Поворот</th><th>Группа поворота</th><th></th></tr></thead><tbody></tbody></table></section>
+<section id="settingsPanel" class="panel settings hidden"><div class="settingsHead"><h2>3. Настройки</h2><button id="closeSettings" type="button" class="secondary" aria-label="Закрыть настройки">×</button></div><label>Ширина пропила, мм<input id="kerf" type="number" value="4" min="0" step="1"></label><label>Отступ от края, мм<input id="margin" type="number" value="0" min="0" step="1"></label><label>Минимальный остаток, мм<input id="minWaste" type="number" value="50" min="0"></label><label>Режим расчёта<select id="mode"><option value="fast">Быстрый</option><option value="standard" selected>Стандартный</option><option value="best">Максимальная экономия</option></select></section>
+<section class="panel result"><div class="resultToolbar"><button id="calcBtn">Рассчитать раскрой</button></div><div class="resultHead"><h2>4. Результат</h2><div id="stats">Расчёт ещё не выполнен</div></div><div class="resultWorkspace"><div id="layouts"><div class="empty">Добавьте листы и детали, затем нажмите «Рассчитать раскрой».</div></div><div id="unplaced" class="unplaced"><h3>Неразмещенные детали</h3><div id="unplacedBoard"></div><div id="unplacedList" class="hidden"></div></div></div></section>
+</main><footer>Прямоугольный раскрой · данные и раскладки сохраняются локально в браузере</footer><script src="optimizer.js"></script><script src="db.js"></script><script src="search-ui.js" defer></script><script src="app.js"></script>
+</body></html>
