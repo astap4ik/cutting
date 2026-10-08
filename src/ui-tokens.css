@@ -1,0 +1,21 @@
+:root {
+  /* Cutting UI source-of-truth tokens. See docs/ui-guidelines.md. */
+  --ui-bg: #f5f7fa;
+  --ui-surface: #ffffff;
+  --ui-surface-secondary: #eef2f6;
+  --ui-text: #1f2a37;
+  --ui-text-secondary: #6b7280;
+  --ui-accent-blue: #1687f5;
+  --ui-accent-cyan: #22c7e8;
+  --ui-action-primary: #f28a24;
+  --ui-divider: rgba(31, 42, 55, 0.08);
+  --ui-shadow-soft: 0 8px 24px rgba(31, 42, 55, 0.08);
+  --ui-radius-surface: 16px;
+  --ui-space-section: 24px;
+  --ui-space-control: 16px;
+  --ui-rail-width: 60px;
+  --ui-drawer-width: 320px;
+  --ui-motion-drawer: 200ms;
+  --ui-motion-hover: 140ms;
+  --ui-font-family: Inter, Manrope, "Segoe UI", Arial, sans-serif;
+}

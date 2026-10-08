@@ -1,6 +1,37 @@
 /* Coordinates: length is X; width is Y. Roll feed runs along Y. */
 (function(root){
 const EPS=1e-7;
+// Free placement requires explicit opt-in; legacy `sheet` options remain saw-safe.
+const isSaw=o=>o.milling!==true;
+function sawPlan(s,o){
+ const k=o.kerf,m=o.margin,cuts=[];
+ function walk(ps,x,y,right,bottom){
+  if(!ps.length)return;
+  if(ps.length===1){
+   const p=ps[0];
+   if(p.x>x+EPS){cuts.push({axis:'X',position:p.x-k,from:y,to:bottom});x=p.x}
+   if(p.y>y+EPS){cuts.push({axis:'Y',position:p.y-k,from:x,to:right});y=p.y}
+   if(p.x+p.length<right-EPS){cuts.push({axis:'X',position:p.x+p.length,from:y,to:bottom});right=p.x+p.length}
+   if(p.y+p.width<bottom-EPS)cuts.push({axis:'Y',position:p.y+p.width,from:x,to:right});
+   return;
+  }
+  for(const axis of ['X','Y']){
+   const start=p=>axis==='X'?p.x:p.y,end=p=>start(p)+(axis==='X'?p.length:p.width);
+   const sorted=[...ps].sort((a,b)=>start(a)-start(b));let edge=end(sorted[0]);
+   for(let i=1;i<sorted.length;i++){
+    if(edge+k<=start(sorted[i])+EPS){
+     cuts.push({axis,position:edge,from:axis==='X'?y:x,to:axis==='X'?bottom:right});
+     if(axis==='X'){walk(sorted.slice(0,i),x,y,edge,bottom);walk(sorted.slice(i),edge+k,y,right,bottom)}
+     else{walk(sorted.slice(0,i),x,y,right,edge);walk(sorted.slice(i),x,edge+k,right,bottom)}
+     return;
+    }
+    edge=Math.max(edge,end(sorted[i]));
+   }
+  }
+  throw Error('Раскладка не допускает последовательных прямых сквозных резов');
+ }
+ walk(s.placed,m,m,s.length-m,s.width-m);return cuts;
+}
 const less=(a,b)=>{for(let i=0;i<a.length;i++){if(Math.abs(a[i]-b[i])>EPS)return a[i]<b[i]}return false};
 function random(seed){let n=seed>>>0;return ()=>{n+=0x6D2B79F5;let t=n;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function prepare(sheets,parts,o){
@@ -25,6 +56,7 @@ function split(f,u){
 }
 function prune(fs){return fs.filter((a,i)=>a.w>EPS&&a.h>EPS&&!fs.some((b,j)=>i!==j&&a.x>=b.x-EPS&&a.y>=b.y-EPS&&a.x+a.w<=b.x+b.w+EPS&&a.y+a.h<=b.y+b.h+EPS&&(j<i||a.w*a.h<b.w*b.h-EPS)))}
 function pack(data,order,o,fit=0,groupRotations={}){
+ o={...o,kind:isSaw(o)?'guillotine':o.kind==='roll'?'roll':'sheet'};
  const k=o.kerf,m=o.margin;
  const all=data.stock.map(s=>({...s,placed:[],cuts:[],free:s.length>2*m&&s.width>2*m?[{x:m,y:m,w:s.length-2*m+k,h:s.width-2*m+k}]:[]}));
  const unplaced=[];
@@ -38,14 +70,16 @@ function pack(data,order,o,fit=0,groupRotations={}){
     const local=fit===0?[Math.min(dw,dh),Math.max(dw,dh)]:fit===1?[f.w*f.h-w*h,Math.min(dw,dh)]:[f.y+h,f.x];
     const occupied=s.placed.reduce((n,a)=>Math.max(n,a.y+a.width),m);
     const cost=o.kind==='roll'?s.length*(Math.max(occupied,f.y+v.width)-occupied):s.placed.length?0:s.length*s.width;
-    const rank=[cost,...local];
+    // Consume stock sequentially: an admissible position on an earlier
+    // sheet must win over a better-looking position on a later sheet.
+    const rank=[all.indexOf(s),cost,...local];
     if(!best||less(rank,best.rank))best={s,v,f,fi,w,h,rank};
    }
   }
   if(!best){unplaced.push({...variants[0]});continue}
   const {s,v,f,fi,w,h}=best,u={x:f.x,y:f.y,w,h};
   s.placed.push({...v,x:f.x,y:f.y});
-  if(o.kind==='guillotine'||o.mode==='fast'){
+  if(isSaw(o)){
    // Disjoint guillotine leaves; recorded cuts are in execution order.
    const horizontal=fit%2===0;
    let rest=horizontal?[{x:f.x+w,y:f.y,w:f.w-w,h},{x:f.x,y:f.y+h,w:f.w,h:f.h-h}]:[{x:f.x+w,y:f.y,w:f.w-w,h:f.h},{x:f.x,y:f.y+h,w,h:f.h-h}];
@@ -67,7 +101,8 @@ function pack(data,order,o,fit=0,groupRotations={}){
   reusable+=s.largestOffcut;
   cutLength+=s.cuts.reduce((n,c)=>n+c.to-c.from,0);
  }
- return {all,layouts,unplaced,area,used,reusable,cutLength,score:[unplaced.length,area,layouts.length,-reusable,cutLength],order:order.map(p=>p.id)};
+ const sheetFill=all.map(s=>-s.placed.reduce((n,p)=>n+p.length*p.width,0));
+ return {all,layouts,unplaced,area,used,reusable,cutLength,score:[unplaced.length,...sheetFill,area,layouts.length,-reusable,cutLength],order:order.map(p=>p.id)};
 }
 function validate(r,data,o){
  const seen=new Set(),sources=new Map(data.items.map(p=>[p.id,p])),groupOrientation=new Map();
@@ -82,6 +117,7 @@ function validate(r,data,o){
  }
  for(const p of r.unplaced){const src=sources.get(p.id);if(!src||seen.has(p.id)||!((p.length===src.length&&p.width===src.width)||(src.rotate&&p.length===src.width&&p.width===src.length)))throw Error('Ошибка количества');checkGroup(src,p);seen.add(p.id)}
  if(seen.size!==data.items.length)throw Error('Потеря деталей');
+ if(isSaw(o))for(const s of r.all)sawPlan(s,o);
  return true;
 }
 function attempt(data,o,index,seed,incumbent){
@@ -96,6 +132,6 @@ function attempt(data,o,index,seed,incumbent){
  }
  const r=pack(data,order,o,index%3,groupRotations);validate(r,data,o);r.seed=seed;r.attempt=index;return r;
 }
-const api={prepare,pack,validate,attempt,less};
+const api={prepare,pack,validate,attempt,less,isSaw,sawPlan};
 if(typeof module!=='undefined')module.exports=api;else root.CuttingOptimizer=api;
 })(globalThis);
