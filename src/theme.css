@@ -518,6 +518,7 @@ html body main #sidebarRoot>#projectsPanel .projectSectionNavItem.active .projec
 html body main #sidebarRoot>#projectsPanel .projectSectionNavItem.active small{color:#666}
 html body main #sidebarRoot>.projectPanelHeader .projectSectionNavTitle{display:flex!important;align-items:center;gap:12px;margin-right:auto;color:#202124!important;font-size:17px!important;font-weight:700!important;letter-spacing:0!important}
 html body main #sidebarRoot>.projectPanelHeader .projectSectionNavAdd{display:grid!important;place-items:center;flex:0 0 30px!important;width:30px!important;height:30px!important;margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;background:#f1f1f1!important;color:#202124!important;font-size:22px!important;font-weight:400!important;line-height:1!important;cursor:pointer}
+html body main #sidebarRoot>.projectPanelHeader .projectSectionNavAdd span{display:block;transform:translateY(-1px)}
 html body main #sidebarRoot>.projectPanelHeader .projectSectionNavAdd:hover{background:#e7e7e7!important}
 html body main #sidebarRoot>.projectPanelHeader .projectSectionNavDivider{width:1px;height:22px;background:#dedede}
 html body main #sidebarRoot>.projectPanelHeader .projectSectionNavTitle strong{color:#202124!important;font-size:17px!important;font-weight:700!important}
