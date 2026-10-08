@@ -507,3 +507,12 @@ html body main #sidebarRoot>#projectsPanel .projectsContent>#projectBasics,html 
 @media(max-width:900px){html body main #sidebarRoot>#projectsPanel .projectsContent{display:block!important;padding:12px!important}html body main #sidebarRoot>#projectsPanel .projectSectionNav{position:static;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #edf1f6}html body main #sidebarRoot>#projectsPanel .projectSectionNavItem{min-height:40px}html body main #sidebarRoot>#projectsPanel .projectsContent>#projectBasics,html body main #sidebarRoot>#projectsPanel .projectsContent>.projectLists,html body main #sidebarRoot>#projectsPanel .projectsContent>.projectCuttingOptions,html body main #sidebarRoot>#projectsPanel .projectsContent>.projectAddMaterialBottom,html body main #sidebarRoot>#projectsPanel .projectsContent>.projectAdvanced,html body main #sidebarRoot>#projectsPanel .projectsContent>#projectArchiveSection{margin-top:12px}}
 html body main #sidebarRoot>#projectsPanel .projectsContent>#projectList{grid-column:2;grid-row:5;scroll-margin-top:12px}
 @media(max-width:900px){html body main #sidebarRoot>#projectsPanel .projectsContent>#projectList{margin-top:12px}}
+html body main #sidebarRoot>#projectsPanel .projectSectionNavTitle{display:flex;align-items:center;gap:12px;padding:0 9px 12px!important;color:#202124;font-size:17px;font-weight:700;letter-spacing:0!important}
+html body main #sidebarRoot>#projectsPanel .projectSectionNavAdd{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;padding:0;border:0;border-radius:50%!important;background:#f1f1f1;color:#202124;font-size:22px;font-weight:400;line-height:1;cursor:pointer}
+html body main #sidebarRoot>#projectsPanel .projectSectionNavAdd:hover{background:#e7e7e7}
+html body main #sidebarRoot>#projectsPanel .projectSectionNavDivider{width:1px;height:22px;background:#dedede}
+html body main #sidebarRoot>#projectsPanel .projectSectionNavTitle strong{font-size:17px;font-weight:700}
+html body main #sidebarRoot>#projectsPanel .projectsContent>#newProjectBtn{display:none!important}
+html body main #sidebarRoot>#projectsPanel .projectSectionNavItem.active{background:#ededed;color:#202124;box-shadow:none}
+html body main #sidebarRoot>#projectsPanel .projectSectionNavItem.active .projectSectionIcon{background:#e4e4e4;color:#202124}
+html body main #sidebarRoot>#projectsPanel .projectSectionNavItem.active small{color:#666}
